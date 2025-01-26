@@ -1,0 +1,28 @@
+@import './base.css';
+
+h2 {
+  margin: 5px 0;
+}
+
+.info {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #00ffff99;
+  color: #222222;
+  display: block;
+}
+
+.warn {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #ffff0099;
+  color: #222222;
+  display: block;
+}
+
+.info span,
+.warn span {
+  font-size: 18px;
+}
