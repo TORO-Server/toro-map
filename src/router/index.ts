@@ -1,36 +1,21 @@
-import { createRouter, createWebHashHistory, createWebHistory /*createWebHistory*/ } from 'vue-router'
-
-import About from '@/views/AboutView.vue'
-import Main from '@/views/MainView.vue'
-
-import Theme from '@/views/ThemeView.vue'
-import Settings from '@/views/SettingsView.vue'
+import { createRouter, createWebHashHistory /*createWebHistory*/ } from 'vue-router'
+import HomeView from '@/views/HomeView.vue'
+import RoutingTestView from '@/views/RoutingTestView.vue'
 
 const router = createRouter({
-    history: createWebHashHistory(),
-    //history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [
-        {
-            path: '/about',
-            name: 'about',
-            component: About
-        },
-        {
-            path: '/',
-            name: 'main',
-            component: Main
-        },
-        {
-            path: '/theme',
-            name: 'theme',
-            component: Theme
-        },
-        {
-            path: '/settings',
-            name: 'settings',
-            component: Settings
-        }
-    ]
+  // Github Pagesにデプロイするのでハッシュルーターにする
+  //history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      component: HomeView,
+    },
+    {
+      path: '/test/:text',
+      component: RoutingTestView,
+    },
+  ],
 })
 
 export default router
