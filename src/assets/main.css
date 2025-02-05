@@ -4,25 +4,27 @@ h2 {
   margin: 5px 0;
 }
 
-.info {
+.ibox {
   margin: 5px 0;
   padding: 10px;
   border-radius: 10px;
+  background-color: #cccccc;
+  color: #222222;
+  display: block;
+}
+
+.ibox.succ {
+  background-color: #00ff0099;
+}
+
+.ibox.info {
   background-color: #00ffff99;
-  color: #222222;
-  display: block;
 }
 
-.warn {
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 10px;
+.ibox.warn {
   background-color: #ffff0099;
-  color: #222222;
-  display: block;
 }
 
-.info span,
-.warn span {
+.ibox span {
   font-size: 18px;
 }

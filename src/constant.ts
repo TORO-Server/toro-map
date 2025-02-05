@@ -56,7 +56,35 @@ export type MarkerSet = {
   }
   layerprio: number
 }
+export type TORDResponse = {
+  main: (
+    | {
+        type: 'expwy' | 'cityexpwy'
+        name: string
+        id: string
+        data: [number, number][]
+      }
+    | {
+        type: 'road'
+        id: string
+        data: [number, number][]
+        level: number
+      }
+  )[]
+  info: {
+    contact: string
+    mcv: string
+    apiv8: string
+  }
+}
+
+export const COLORSET = {
+  expwy: 0x339966,
+  cityexpwy: 0x993366,
+  road: 0x666666,
+}
 
 // 定数とか
 export const MARKERURL = (w: (typeof WORLD)[keyof typeof WORLD]) =>
   `https://map.torosaba.net/tiles/_markers_/marker_${w}.json`
+export const TORDURL = `https://script.google.com/macros/s/AKfycbzh5ciy61RpbxrY80Z_rfTlwroRqeIdcmVXZQOVBD3fAhOvbn0fV5lDaggGFOo6AL47/exec`

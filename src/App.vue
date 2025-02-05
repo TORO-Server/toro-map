@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+
 import MapUI from './components/MapUI.vue'
 
 import { WORLD } from './constant'

@@ -1,10 +1,19 @@
-import { WORLD, type Marker } from '@/constant'
+import { WORLD, type Marker, type TORDResponse } from '@/constant'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useDataMapStore = defineStore('datamap', () => {
   const currentWorld = ref<(typeof WORLD)[keyof typeof WORLD]>(WORLD.MAIN)
   const markers = ref<{ [key: string]: Marker }>({})
+  const tord = ref<TORDResponse | null>(null)
 
-  return { currentWorld, markers }
+  const connections = ref<{
+    dynmap: boolean
+    tord: boolean
+  }>({
+    dynmap: false,
+    tord: false,
+  })
+
+  return { currentWorld, markers, tord, connections }
 })
