@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { MARKERURL, type Marker, type WORLD } from '@/constant'
+import { COLORSET, MARKERURL, TORDURL, WORLD, type Marker, type TORDResponse } from '@/constant'
 import { useDataMapStore } from '@/stores/datamap'
 import { Application, Container, Graphics, Point } from 'pixi.js'
 import { onMounted, ref, watch } from 'vue'
@@ -87,12 +87,17 @@ onMounted(async () => {
     parent.position.y += mouseY - newLocalPos.y
   }
 
-  async function switchWorld(world: (typeof WORLD)[keyof typeof WORLD]) {
-    dataMapStore.currentWorld = world
-    const res = (await (await fetch(MARKERURL(world))).json()) as Marker
-    dataMapStore.markers[world] = res
+  async function renderAll(res: Marker, tordres?: TORDResponse) {
     areas.removeChildren()
     lines.removeChildren()
+
+    const tordkeys: string[] = []
+
+    if (tordres)
+      for (const elm of tordres.main)
+        if (elm.id.includes(',')) for (const key of elm.id.split(',')) tordkeys.push(key)
+        else tordkeys.push(elm.id)
+
     for (const set of Object.values(res.sets)) {
       for (const area of Object.values(set.areas)) {
         const graphic = areas
@@ -115,7 +120,9 @@ onMounted(async () => {
 
         graphic.lineTo(area.x[0], area.z[0]).fill().stroke()
       }
-      for (const line of Object.values(set.lines)) {
+      for (const [key, line] of Object.entries(set.lines)) {
+        if (tordkeys.includes(key)) continue
+
         const graphic = lines
           .addChild(new Graphics())
           .setStrokeStyle({
@@ -133,6 +140,83 @@ onMounted(async () => {
         graphic.stroke()
       }
     }
+
+    if (tordres)
+      for (const elm of tordres.main) {
+        if (elm.type === 'road') {
+          const graphic = lines
+            .addChild(new Graphics())
+            .setStrokeStyle({
+              color: COLORSET.road,
+              width: 10,
+              alpha: 0.7,
+            })
+            .beginPath()
+            .moveTo(elm.data[0][0], elm.data[0][1])
+
+          for (let i = 1; i < elm.data.length; i++) {
+            graphic.lineTo(elm.data[i][0], elm.data[i][1])
+          }
+
+          graphic.stroke()
+        } else if (elm.type === 'expwy') {
+          const graphic = lines
+            .addChild(new Graphics())
+            .setStrokeStyle({
+              color: COLORSET.expwy,
+              width: 50,
+              alpha: 0.7,
+            })
+            .beginPath()
+            .moveTo(elm.data[0][0], elm.data[0][1])
+
+          for (let i = 1; i < elm.data.length; i++) {
+            graphic.lineTo(elm.data[i][0], elm.data[i][1])
+          }
+
+          graphic.stroke()
+        } else if (elm.type === 'cityexpwy') {
+          const graphic = lines
+            .addChild(new Graphics())
+            .setStrokeStyle({
+              color: COLORSET.cityexpwy,
+              width: 30,
+              alpha: 0.7,
+            })
+            .beginPath()
+            .moveTo(elm.data[0][0], elm.data[0][1])
+
+          for (let i = 1; i < elm.data.length; i++) {
+            graphic.lineTo(elm.data[i][0], elm.data[i][1])
+          }
+
+          graphic.stroke()
+        }
+      }
+  }
+
+  async function switchWorld(world: (typeof WORLD)[keyof typeof WORLD]) {
+    // TORD Task
+    if (dataMapStore.tord && world === WORLD.MAIN)
+      renderAll(dataMapStore.markers[dataMapStore.currentWorld], dataMapStore.tord)
+    else if (world === WORLD.MAIN)
+      fetch(TORDURL)
+        .then((rs) => rs.json() as Promise<TORDResponse>)
+        .then((tr) => {
+          dataMapStore.connections.tord = true
+          dataMapStore.tord = tr
+          renderAll(dataMapStore.markers[dataMapStore.currentWorld], tr)
+        })
+        .catch((err) => console.error(err))
+    // DynmapTask
+    dataMapStore.currentWorld = world
+    let res = dataMapStore.markers[world]
+    if (!res) {
+      res = (await (await fetch(MARKERURL(world))).json()) as Marker
+      dataMapStore.connections.dynmap = true
+      dataMapStore.markers[world] = res
+    }
+    renderAll(res)
   }
 
   _switchWorld = switchWorld
