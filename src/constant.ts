@@ -3,6 +3,8 @@ export const WORLD = {
   MAIN: 'main',
   FLAT: 'flat',
   MAP: 'map',
+  /*OLDMAIN: 'oldmain',
+  SALMON: 'salmon',*/
 } as const
 export type Marker = {
   sets: {
