@@ -26,9 +26,7 @@ const datamapStore = useDataMapStore()
         datamapStore.connections.tord ? 'TORD 接続済み' : 'TORD との接続を試みています...'
       }}</span>
       <p>
-        Googleスプレッドシート上のデータから取得します。カーブは微妙ですが、Dynampよりも多くの情報を提供します。
-        具体的には、一部都市の一般道のデータ・一部都市の都市高速、その他基本的な高速道路のポリゴンデータ。
-        TORDはデータ量が多いので、数十秒かかることがあります。
+        Googleスプレッドシート上のデータから取得します。TORDはデータ量が多いので、数十秒かかることがあります。
       </p>
     </div>
   </div>

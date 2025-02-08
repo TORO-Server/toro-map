@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory /*createWebHistory*/ } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
 import RoutingTestView from '@/views/RoutingTestView.vue'
+import HomeView from '@/views/HomeView.vue'
 
 const router = createRouter({
   // Github Pagesにデプロイするのでハッシュルーターにする

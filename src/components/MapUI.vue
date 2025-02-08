@@ -27,6 +27,7 @@ onMounted(async () => {
     autoDensity: true,
   })
   canvasContainer.value.appendChild(app.canvas)
+  ;(globalThis as { pixiapp?: Application }).pixiapp = app
 
   // グループ類
   const parent = app.stage.addChild(new Container())
@@ -35,13 +36,13 @@ onMounted(async () => {
 
   app.stage.hitArea = app.screen
   app.stage.interactive = true
-  app.stage.onmousedown = (e) => {
+  app.stage.onpointerdown = (e) => {
     // ドラッグ開始・onmousemoveトリガー時のためにstartPos保存
     isDragging = true
     startX = e.clientX
     startY = e.clientY
   }
-  app.stage.onmousemove = (e) => {
+  app.stage.onpointermove = (e) => {
     // ドラッグしてなければパス
     if (!isDragging) return
     const rect = app.canvas.getBoundingClientRect()
@@ -62,7 +63,7 @@ onMounted(async () => {
     startX = e.clientX
     startY = e.clientY
   }
-  app.stage.onmouseup = () => {
+  app.stage.onpointerup = () => {
     // ドラッグ終了
     isDragging = false
   }
@@ -105,11 +106,11 @@ onMounted(async () => {
           .setStrokeStyle({
             color: area.color,
             width: area.weight * 5,
-            alpha: area.opacity,
+            alpha: area.opacity / 2,
           })
           .setFillStyle({
             color: area.fillcolor,
-            alpha: area.fillopacity,
+            alpha: area.fillopacity / 2,
           })
           .beginPath()
           .moveTo(area.x[0], area.z[0])
@@ -197,17 +198,18 @@ onMounted(async () => {
 
   async function switchWorld(world: (typeof WORLD)[keyof typeof WORLD]) {
     // TORD Task
-    if (dataMapStore.tord && world === WORLD.MAIN)
-      renderAll(dataMapStore.markers[dataMapStore.currentWorld], dataMapStore.tord)
-    else if (world === WORLD.MAIN)
-      fetch(TORDURL)
-        .then((rs) => rs.json() as Promise<TORDResponse>)
-        .then((tr) => {
-          dataMapStore.connections.tord = true
-          dataMapStore.tord = tr
-          renderAll(dataMapStore.markers[dataMapStore.currentWorld], tr)
-        })
-        .catch((err) => console.error(err))
+    if (!dataMapStore.tord) {
+      ;(async () => {
+        fetch(TORDURL)
+          .then((rs) => rs.json() as Promise<TORDResponse>)
+          .then((tr) => {
+            dataMapStore.connections.tord = true
+            dataMapStore.tord = tr
+            if (world === WORLD.MAIN) renderAll(dataMapStore.markers[dataMapStore.currentWorld], tr)
+          })
+          .catch((err) => console.error(err))
+      })()
+    }
     // DynmapTask
     dataMapStore.currentWorld = world
     let res = dataMapStore.markers[world]
@@ -216,7 +218,9 @@ onMounted(async () => {
       dataMapStore.connections.dynmap = true
       dataMapStore.markers[world] = res
     }
-    renderAll(res)
+    if (dataMapStore.tord && world === WORLD.MAIN)
+      renderAll(dataMapStore.markers[dataMapStore.currentWorld], dataMapStore.tord)
+    else renderAll(res)
   }
 
   _switchWorld = switchWorld
